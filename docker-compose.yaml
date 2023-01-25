@@ -6,19 +6,6 @@ services:
       - "1883:1883"
       - "9001:9001"
     restart: unless-stopped
-  telemetry:
-    image: iqtlabs/edgetech-telemetry:latest
-    build:
-      context: ./edgetech-telemetry-pinephone/telemetry
-      dockerfile: ./Dockerfile
-    volumes:
-      - /sys/class/power_supply/rk818-battery/capacity:/battery_capacity
-      - /proc/uptime:/uptime
-    restart: unless-stopped
-    depends_on: 
-      - mqtt
-    env_file:
-      - .env
   http-uploader:
     image: iqtlabs/edgetech-http-uploader:latest
     build:
