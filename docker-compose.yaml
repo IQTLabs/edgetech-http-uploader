@@ -9,13 +9,15 @@ services:
   http-uploader:
     image: iqtlabs/edgetech-http-uploader:latest
     build:
-      context: ./edgetech-http-uploader/http-uploader
+      context: ./http-uploader
       dockerfile: ./Dockerfile
     restart: unless-stopped
     depends_on: 
       - mqtt
-    environment:
-      - WEBHOOK_URL=${WEBHOOK_URL:?error}
-      - WEBHOOK_TOKEN=${WEBHOOK_TOKEN:?error}
     env_file:
       - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "10"
