@@ -1,5 +1,6 @@
 """This file contains the HTTPUploaderPubSub class which is a child class of BaseMQTTPubSub. The
-HTTP UploaderPubSub writes data published to on the telemetry topic and posts that to an HTTP endpoint. 
+HTTP UploaderPubSub writes data published to on the telemetry topic and posts that to an
+HTTP endpoint. 
 """
 import os
 from time import sleep
@@ -32,13 +33,13 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
         a payload to POST to an HTTP endpoint, currently directed at Tag.IO.
 
         Args:
-            telemetry_topic (str): topic to read data from, currently only telemetry is being posted.
+            telemetry_topic (str): topic to read data from, currently only telemetry is posted.
             webhook_url (str): the URL of the webhook to POST to.
             webhook_token (str): the token to validate POST.
             debug (bool, optional):If the debug mode is turned on, log statements print to stdout.
             Defaults to False.
         """
-        # Pass enviornment variables as parameters (include **kwargs) in super().__init__()
+        # Pass environment variables as parameters (include **kwargs) in super().__init__()
         super().__init__(**kwargs)
 
         # assign class attributes
@@ -55,13 +56,13 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
     def _http_upload_callback(
         self: Any, _client: mqtt.Client, _userdata: Dict[Any, Any], msg: Any
     ) -> None:
-        """Callback to trigger HTTP POST of message when topic data is recieved.
+        """Callback to trigger HTTP POST of message when topic data is received.
 
         Args:
-           _client (mqtt.Client): the MQTT client that was instatntiated in the constructor.
+           _client (mqtt.Client): the MQTT client that was instantiated in the constructor.
            _userdata (Dict[Any,Any]): data passed to the callback through the MQTT paho Client
-           class contructor or set later through user_data_set().
-           msg (Any): the recieved message over the subscribed channel that includes
+           class constructor or set later through user_data_set().
+           msg (Any): the received message over the subscribed channel that includes
            the topic name and payload after decoding.
         """
         # decode message
