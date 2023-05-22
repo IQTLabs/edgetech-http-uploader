@@ -5,4 +5,4 @@ RUN pip3 install poetry==1.1.5
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-dev
 ADD ./http_uploader_pub_sub.py .
-ENTRYPOINT [ "python3", "http_uploader_pub_sub.py" ]
+ENTRYPOINT [ "python3", "-u", "http_uploader_pub_sub.py" ]

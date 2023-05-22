@@ -9,6 +9,7 @@ from typing import Any, Dict
 import schedule
 import paho.mqtt.client as mqtt
 import httpx
+import logging
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
 
@@ -48,6 +49,10 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
         self.webhook_token = webhook_token
         self.debug = debug
 
+        # Configure logging
+        if self.debug == True:
+            logging.getLogger().setLevel(logging.DEBUG)
+
         # Connect client in constructor
         self.connect_client()
         sleep(1)
@@ -68,7 +73,7 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
         # decode message
         payload = json.loads(str(msg.payload.decode("utf-8")))
         if self.debug:
-            print(f"payload: {payload}")
+            logging.debug(f"payload: {payload}")
 
         # POST header for validation (this if for Tag.IO)
         headers = {"Device-Token": self.webhook_token}
@@ -78,21 +83,22 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
                 self.webhook_url, headers=headers, json=payload, timeout=5.0
             )
             if self.debug:
-                print(f"POST status: {result.status_code}")
+                logging.debug(f"POST status: {result.status_code}")
         except httpx.RequestError as exception:
-            print(f"HTTP POST failed because: {exception}")
+            logging.debug(f"HTTP POST failed because: {exception}")
 
     def main(self: Any) -> None:
         """Main loop and function that setup the heartbeat to keep the TCP/IP
         connection alive and publishes the data to the MQTT broker and keeps the
         main thread alive.
         """
+
         # schedule heartbeat
         schedule.every(10).seconds.do(
             self.publish_heartbeat, payload="HTTP Uploader Heartbeat"
         )
 
-        # subscript to telemetry topic
+        # subscribe to telemetry topic
         self.add_subscribe_topic(self.telemetry_topic, self._http_upload_callback)
 
         while True:
@@ -103,8 +109,7 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
                 sleep(0.001)
 
             except KeyboardInterrupt as exception:
-                if self.debug:
-                    print(exception)
+                logging.debug(exception)
 
 
 if __name__ == "__main__":
@@ -113,5 +118,6 @@ if __name__ == "__main__":
         webhook_url=str(os.environ.get("WEBHOOK_URL")),
         webhook_token=str(os.environ.get("WEBHOOK_TOKEN")),
         mqtt_ip=os.environ.get("MQTT_IP"),
+        debug=True if str(os.environ.get("DEBUG")) == "True" else False
     )
     uploader.main()
