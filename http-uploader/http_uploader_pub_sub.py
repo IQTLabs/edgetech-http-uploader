@@ -23,7 +23,7 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
 
     def __init__(
         self: Any,
-        telemetry_topic: str,
+        telemetry_json_topic: str,
         webhook_url: str,
         webhook_token: str,
         debug: bool = False,
@@ -33,7 +33,7 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
         a payload to POST to an HTTP endpoint, currently directed at Tag.IO.
 
         Args:
-            telemetry_topic (str): topic to read data from, currently only telemetry is posted.
+            telemetry_json_topic (str): topic to read data from, currently only telemetry is posted.
             webhook_url (str): the URL of the webhook to POST to.
             webhook_token (str): the token to validate POST.
             debug (bool, optional):If the debug mode is turned on, log statements print to stdout.
@@ -43,7 +43,7 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
         super().__init__(**kwargs)
 
         # assign class attributes
-        self.telemetry_topic = telemetry_topic
+        self.telemetry_json_topic = telemetry_json_topic
         self.webhook_url = webhook_url
         self.webhook_token = webhook_token
         self.debug = debug
@@ -93,7 +93,7 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
         )
 
         # subscript to telemetry topic
-        self.add_subscribe_topic(self.telemetry_topic, self._http_upload_callback)
+        self.add_subscribe_topic(self.telemetry_json_topic, self._http_upload_callback)
 
         while True:
             try:
@@ -109,7 +109,7 @@ class HTTPUploaderPubSub(BaseMQTTPubSub):
 
 if __name__ == "__main__":
     uploader = HTTPUploaderPubSub(
-        telemetry_topic=str(os.environ.get("TELEMETRY_TOPIC")),
+        telemetry_json_topic=str(os.environ.get("TELEMETRY_JSON_TOPIC")),
         webhook_url=str(os.environ.get("WEBHOOK_URL")),
         webhook_token=str(os.environ.get("WEBHOOK_TOKEN")),
         mqtt_ip=os.environ.get("MQTT_IP"),
